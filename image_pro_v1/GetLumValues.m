@@ -1,17 +1,11 @@
-% BRG 1/27/20
-%% Set image path
-image_path='\\ccn-cabezaserv1.win.duke.edu\Data\SAM\Exemplar1_Mar2016_square\';
-%% Read in relevant files
-%
-wrk_dir='C:\Users\brg13\Google Drive\Papers (manuscripts)\SEA\Cerebral Cortex Submission\';
-addpath(genpath('\\ccn-cabezaserv1.win.duke.edu\Data\Geib\Scripts\Public\function_files\'));
-data1=excel_reader(fullfile(wrk_dir,'PresentationStimList.csv'));
-data2=excel_reader(fullfile(wrk_dir,'SAM_enc_pro_3500.csv'));
 %% Compute luminance
 % see: 
 % https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
-for iStim=1:954
-    X=double(imread(fullfile(image_path,data1{3}.col{iStim})));
+image_path='';      % Add image path
+image_name={'',''}; % List of image names
+
+for iStim=1:length(im_name)
+    X=double(imread(fullfile(image_path,image_name{ii})));
     % Step 1: Normalize
     R=reshape(X(:,:,1)/255,1,[]);
     G=reshape(X(:,:,2)/255,1,[]);
@@ -37,25 +31,7 @@ for iStim=1:954
     
     ImInfo(iStim).name=data1{3}.col{iStim};
     ImInfo(iStim).lum=mean2(Y1);
-    ImInfo(iStim).perlum=mean2(Y2);
+    ImInfo(iStim).perlum=mean2(Y2); % L*
     clear Y1 X R G B;
     clear Rnew Gnew Bnew Y2;
 end
-%% Compare to subject data
-data3{1}.header='StimulusName';
-data3{2}.header='LuminanceValue';
-data3{3}.header='PerLuminanceValue';
-for iTrial=1:640
-    Ind=cell2num(data2{4}.col(iTrial));
-    if Ind ~= 0
-        data3{1}.col{iTrial}=ImInfo(Ind).name;
-        data3{2}.col{iTrial}=ImInfo(Ind).lum;
-        data3{3}.col{iTrial}=ImInfo(Ind).perlum;
-    else
-        data3{1}.col{iTrial}='Catch';
-        data3{2}.col{iTrial}='Nan';
-        data3{3}.col{iTrial}='Nan';
-    end
-end
-
-write_struct(data3,fullfile(wrk_dir,'LumValues.csv'));
